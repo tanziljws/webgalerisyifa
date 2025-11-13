@@ -46,7 +46,7 @@ class MarkMigrationsAsRun extends Command
             }
         }
 
-        $this->info("✅ Found {count($existingTables)} existing tables");
+        $this->info("✅ Found " . count($existingTables) . " existing tables");
 
         if (count($existingTables) < 10) {
             $this->warn('⚠️  Not enough tables found. Are you sure you imported the SQL dump?');

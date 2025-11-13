@@ -8,68 +8,80 @@ use App\Models\Kategori;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Illuminate\Support\Facades\Cache;
 
 class GaleriController extends Controller
 {
     public function index(Request $request)
     {
         $user = auth()->user();
+        $kategoriFilter = $request->kategori;
         
-        // Query fotos with eager loading
-        $query = Foto::with(['kategori'])
-            ->withCount(['comments as comments_count' => function($query) {
-                $query->where('status', 'approved');
-            }])
-            // IMPORTANT: Load REAL likes count from database
-            // This count is from ALL users and available to both authenticated & guest users
-            // Data is retrieved directly from foto_likes table
-            ->withCount('likes as likes_count')
-            ->where('status', 'Aktif')
-            // Filter: Hanya tampilkan foto dari kategori yang aktif
-            ->whereHas('kategori', function($q) {
-                $q->where('status', 'Aktif');
-            })
-            ->when($user, function($q) use ($user) {
-                // Load only current user's like status (to determine if they liked it)
-                $q->with(['likes' => function($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                }]);
-            });
-
-        // Filter berdasarkan kategori
-        if ($request->has('kategori') && $request->kategori) {
-            $kategoriSlug = $request->kategori;
-            
-            // Cari kategori berdasarkan slug yang dibuat dari nama
-            $kategori = Kategori::where('status', 'Aktif')->get()->first(function($k) use ($kategoriSlug) {
-                $kategoriSlugFromName = strtolower(str_replace([' ', '&'], ['', ''], $k->nama));
-                return $kategoriSlugFromName === $kategoriSlug;
-            });
-            
-            if ($kategori) {
-                $query->where('kategori_id', $kategori->id);
-            }
-        }
-
-        $fotos = $query->orderBy('created_at', 'desc')->get();
+        // Create cache key based on request parameters
+        $cacheKey = 'galeri_index_' . md5($kategoriFilter . ($user ? $user->id : 'guest') . request()->fullUrl());
         
-        // Ambil hanya kategori yang memiliki foto aktif untuk filter
-        $kategoris = Kategori::where('status', 'Aktif')
-            ->whereHas('fotos', function($q) {
-                $q->where('status', 'Aktif');
-            })
-            ->orderBy('nama', 'asc')
-            ->get();
+        // Try to get from cache first
+        $data = Cache::remember($cacheKey, 300, function() use ($user, $request, $kategoriFilter) {
+            // Query fotos with eager loading
+            $query = Foto::with(['kategori'])
+                ->withCount(['comments as comments_count' => function($query) {
+                    $query->where('status', 'approved');
+                }])
+                // IMPORTANT: Load REAL likes count from database
+                // This count is from ALL users and available to both authenticated & guest users
+                // Data is retrieved directly from foto_likes table
+                ->withCount('likes as likes_count')
+                ->where('status', 'Aktif')
+                // Filter: Hanya tampilkan foto dari kategori yang aktif
+                ->whereHas('kategori', function($q) {
+                    $q->where('status', 'Aktif');
+                })
+                ->when($user, function($q) use ($user) {
+                    // Load only current user's like status (to determine if they liked it)
+                    $q->with(['likes' => function($query) use ($user) {
+                        $query->where('user_id', $user->id);
+                    }]);
+                });
 
-        // Add is_liked status to each foto
-        $fotos->each(function($foto) use ($user) {
-            if ($user) {
-                // Check if current user has liked this photo
-                $foto->is_liked = $foto->likes->contains('user_id', $user->id);
-            } else {
-                $foto->is_liked = false;
+            // Filter berdasarkan kategori
+            if ($request->has('kategori') && $request->kategori) {
+                $kategoriSlug = $request->kategori;
+                
+                // Cari kategori berdasarkan slug yang dibuat dari nama
+                $kategori = Kategori::where('status', 'Aktif')->get()->first(function($k) use ($kategoriSlug) {
+                    $kategoriSlugFromName = strtolower(str_replace([' ', '&'], ['', ''], $k->nama));
+                    return $kategoriSlugFromName === $kategoriSlug;
+                });
+                
+                if ($kategori) {
+                    $query->where('kategori_id', $kategori->id);
+                }
             }
+
+            $fotos = $query->orderBy('created_at', 'desc')->get();
+            
+            // Ambil hanya kategori yang memiliki foto aktif untuk filter
+            $kategoris = Kategori::where('status', 'Aktif')
+                ->whereHas('fotos', function($q) {
+                    $q->where('status', 'Aktif');
+                })
+                ->orderBy('nama', 'asc')
+                ->get();
+
+            // Add is_liked status to each foto
+            $fotos->each(function($foto) use ($user) {
+                if ($user) {
+                    // Check if current user has liked this photo
+                    $foto->is_liked = $foto->likes->contains('user_id', $user->id);
+                } else {
+                    $foto->is_liked = false;
+                }
+            });
+            
+            return compact('fotos', 'kategoris');
         });
+        
+        extract($data);
 
         return view('galeri', compact('fotos', 'kategoris'))->with('galeri', $fotos);
     }

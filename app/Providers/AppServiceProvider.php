@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use App\Models\Foto;
+use App\Observers\FotoObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register the Foto observer
+        Foto::observe(FotoObserver::class);
+        
         // Auto-fix agendas table if it's missing or incomplete
         try {
             if (!Schema::hasTable('agendas')) {

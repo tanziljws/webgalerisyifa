@@ -73,6 +73,9 @@ body {
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
     margin-top: 30px;
+    /* Performance optimizations */
+    contain: layout style;
+    will-change: transform;
 }
 
 /* Modern Card Styles */
@@ -105,6 +108,7 @@ body {
     display: flex;
     flex-direction: column;
     border: 1px solid #eef1f5;
+    contain: layout style;
 }
 
 .gallery-card:hover {
@@ -120,13 +124,22 @@ body {
     position: relative;
     cursor: pointer;
     flex-shrink: 0;
+    background-color: #f5f7fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-
+    
 .gallery-card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.4s ease;
+    /* Optimize rendering */
+    will-change: transform;
+    backface-visibility: hidden;
+    /* Lazy loading */
+    loading: lazy;
 }
 
 .gallery-card:hover .gallery-card-image img {
@@ -848,7 +861,13 @@ body {
             <div class="gallery-card">
                 <!-- Image Container -->
                 <div class="gallery-card-image" onclick="openImagePreview('{{ Storage::url($foto->path) }}', '{{ $foto->judul }}')">
-                    <img src="{{ Storage::url($foto->path) }}" alt="{{ $foto->judul }}">
+                    <img src="{{ Storage::url($foto->path) }}" 
+                         alt="{{ $foto->judul }}" 
+                         loading="lazy"
+                         width="300" 
+                         height="300"
+                         decoding="async"
+                         fetchpriority="{{ $loop->first ? 'high' : 'low' }}">
                     <div class="card-image-overlay">
                         <div style="color: white;">
                             <h3 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 4px;">{{ $foto->judul }}</h3>

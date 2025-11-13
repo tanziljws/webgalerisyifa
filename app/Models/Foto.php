@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\ImageOptimizer;
 
 class Foto extends Model
 {
@@ -177,8 +178,16 @@ class Foto extends Model
 
     public function getThumbnailPathAttribute()
     {
-        // You can implement thumbnail generation logic here
-        return $this->full_path;
+        // Return optimized thumbnail URL
+        return $this->getOptimizedImageUrl(300, 300);
+    }
+    
+    /**
+     * Get optimized image URL
+     */
+    public function getOptimizedImageUrl($width = 300, $height = 300)
+    {
+        return \App\Helpers\ImageOptimizer::getOptimizedImageUrl($this->path, $width, $height);
     }
 
     // Compatibility accessors/mutators to map `file` <-> `path`
