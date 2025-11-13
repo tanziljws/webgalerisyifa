@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip if table already has correct structure (from SQL import)
+        if (Schema::hasTable('gallery_likes') && Schema::hasColumn('gallery_likes', 'foto_id')) {
+            return;
+        }
+        
         // First, drop the existing gallery_likes table if it exists
         Schema::dropIfExists('gallery_likes');
 

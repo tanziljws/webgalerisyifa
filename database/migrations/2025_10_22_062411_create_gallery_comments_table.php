@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip if table already exists (from SQL import)
+        if (Schema::hasTable('gallery_comments')) {
+            return;
+        }
+        
         Schema::create('gallery_comments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('gallery_id')->constrained()->onDelete('cascade');

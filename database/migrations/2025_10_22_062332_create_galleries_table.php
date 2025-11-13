@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip if table already exists (from SQL import)
+        if (Schema::hasTable('galleries')) {
+            return;
+        }
+        
         Schema::create('galleries', function (Blueprint $table) {
             $table->id();
             $table->string('title');
