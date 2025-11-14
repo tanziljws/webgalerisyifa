@@ -118,6 +118,7 @@
             margin-bottom: 0.5rem;
             flex-shrink: 0;
             position: relative;
+            overflow: visible; /* Allow close button to be visible */
         }
 
         /* Close button for mobile */
@@ -129,23 +130,30 @@
             background: rgba(59, 130, 246, 0.1);
             border: none;
             border-radius: 6px;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             align-items: center;
             justify-content: center;
             color: var(--sidebar-text);
             cursor: pointer;
             transition: all 0.2s ease;
-            z-index: 10;
+            z-index: 1051;
+            pointer-events: auto;
         }
 
         .sidebar-close:hover {
             background: rgba(59, 130, 246, 0.2);
             color: var(--blue-medium);
+            transform: scale(1.1);
+        }
+
+        .sidebar-close:active {
+            transform: scale(0.95);
         }
 
         .sidebar-close i {
             font-size: 1rem;
+            pointer-events: none; /* Make icon non-clickable, only button is clickable */
         }
 
         @media (max-width: 767.98px) {
@@ -879,7 +887,7 @@
                         </div>
                     </div>
                     <!-- Close button for mobile -->
-                    <button class="sidebar-close" id="sidebarClose">
+                    <button class="sidebar-close" id="sidebarClose" type="button" onclick="if(typeof closeSidebar === 'function') { closeSidebar(); } else { const s = document.getElementById('sidebar'); const o = document.getElementById('sidebarOverlay'); const i = document.getElementById('toggleIcon'); if(s) s.classList.remove('show'); if(o) o.classList.remove('show'); document.body.style.overflow = ''; if(i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); } } return false;">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -966,16 +974,23 @@
                 console.log('✅ Sidebar hidden on mobile load');
             }
             
-            // Function to close sidebar
-            function closeSidebar() {
+            // Function to close sidebar (make it global so onclick can access it)
+            window.closeSidebar = function() {
                 console.log('🔒 Closing sidebar');
-                if (sidebar) sidebar.classList.remove('show');
-                if (overlay) overlay.classList.remove('show');
+                const s = document.getElementById('sidebar');
+                const o = document.getElementById('sidebarOverlay');
+                const i = document.getElementById('toggleIcon');
+                if (s) s.classList.remove('show');
+                if (o) o.classList.remove('show');
                 document.body.style.overflow = '';
-                if (toggleIcon) {
-                    toggleIcon.classList.remove('fa-times');
-                    toggleIcon.classList.add('fa-bars');
+                if (i) {
+                    i.classList.remove('fa-times');
+                    i.classList.add('fa-bars');
                 }
+            };
+            
+            function closeSidebar() {
+                window.closeSidebar();
             }
             
             // Function to open sidebar
@@ -1009,31 +1024,27 @@
                     }
                 });
                 
-                // Close sidebar when clicking close button
+                // Close sidebar when clicking close button (HIGHEST PRIORITY)
                 if (sidebarClose) {
                     sidebarClose.addEventListener('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
+                        e.stopImmediatePropagation();
                         console.log('❌ Close button clicked');
                         closeSidebar();
-                    });
+                        return false;
+                    }, true); // Use capture phase for higher priority
                 }
                 
                 // Close sidebar when clicking overlay
-                overlay.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('⬛ Overlay clicked');
-                    closeSidebar();
-                });
-                
-                // Close sidebar when clicking outside on mobile
-                document.addEventListener('click', function(event) {
-                    if (window.innerWidth <= 767.98) {
-                        if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
-                            closeSidebar();
-                        }
-                    }
-                });
+                if (overlay) {
+                    overlay.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('⬛ Overlay clicked');
+                        closeSidebar();
+                    });
+                }
                 
                 // Close sidebar when clicking nav link on mobile
                 const navLinks = sidebar.querySelectorAll('.nav-link');
@@ -1055,9 +1066,25 @@
                     }
                 });
                 
-                // Prevent sidebar from closing when clicking inside it
+                // Prevent sidebar from closing when clicking inside it (but allow close button)
                 sidebar.addEventListener('click', function(e) {
+                    // Don't stop propagation if clicking the close button
+                    if (e.target.closest('.sidebar-close')) {
+                        return;
+                    }
                     e.stopPropagation();
+                });
+                
+                // Close sidebar when clicking outside on mobile (lower priority)
+                document.addEventListener('click', function(event) {
+                    if (window.innerWidth <= 767.98 && sidebar.classList.contains('show')) {
+                        // Don't close if clicking on toggle, close button, or inside sidebar
+                        if (!sidebar.contains(event.target) && 
+                            !sidebarToggle.contains(event.target) &&
+                            !event.target.closest('.sidebar-close')) {
+                            closeSidebar();
+                        }
+                    }
                 });
                 
                 // Close sidebar when pressing Escape key
