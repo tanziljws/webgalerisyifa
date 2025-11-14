@@ -540,9 +540,9 @@ async function viewPhoto(photoId) {
     });
     
     try {
-        // Use route helper to ensure correct URL
-        const baseUrl = '{{ url("/") }}';
-        const url = `${baseUrl}/admin/fotos/${photoId}`;
+        // Use relative URL to avoid mixed content issues
+        // This will automatically use the same protocol (HTTPS) as the current page
+        const url = `/admin/fotos/${photoId}`;
         
         const res = await fetch(url, {
             method: 'GET',
@@ -564,6 +564,7 @@ async function viewPhoto(photoId) {
         
         if (data?.success && data?.data) {
             const f = data.data;
+            // Use window.location.origin to ensure HTTPS
             const imageSrc = f.full_path || (f.path ? `${window.location.origin}/storage/${f.path}` : '');
             
             const viewPhotoImage = document.getElementById('viewPhotoImage');
@@ -632,9 +633,9 @@ async function editPhoto(photoId) {
     });
     
     try {
-        // Use route helper to ensure correct URL
-        const baseUrl = '{{ url("/") }}';
-        const url = `${baseUrl}/admin/fotos/${photoId}`;
+        // Use relative URL to avoid mixed content issues
+        // This will automatically use the same protocol (HTTPS) as the current page
+        const url = `/admin/fotos/${photoId}`;
         
         const res = await fetch(url, {
             method: 'GET',
@@ -667,6 +668,7 @@ async function editPhoto(photoId) {
             // Update current photo preview if element exists
             const currentPhotoElement = document.getElementById('edit_current_photo');
             if (currentPhotoElement) {
+                // Use window.location.origin to ensure HTTPS
                 const imageSrc = f.full_path || (f.path ? `${window.location.origin}/storage/${f.path}` : '');
                 if (imageSrc) {
                     currentPhotoElement.src = imageSrc;
@@ -731,7 +733,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add _method for Laravel to recognize as PUT request
                 formData.append('_method', 'PUT');
                 
-                const res = await fetch(`{{ url('admin/fotos') }}/${currentPhotoId}`, {
+                // Use relative URL to avoid mixed content issues
+                const res = await fetch(`/admin/fotos/${currentPhotoId}`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

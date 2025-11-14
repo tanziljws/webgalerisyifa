@@ -23,8 +23,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Force HTTPS in production
+        // Force HTTPS in production or if FORCE_HTTPS is set
         if (config('app.env') === 'production' || env('FORCE_HTTPS', false)) {
+            \URL::forceScheme('https');
+        }
+        
+        // Also force HTTPS if APP_URL is HTTPS
+        $appUrl = config('app.url');
+        if ($appUrl && str_starts_with($appUrl, 'https://')) {
+            \URL::forceScheme('https');
+        }
+        
+        // Force HTTPS if request is HTTPS (for Railway/Cloud hosting)
+        if (request()->secure() || request()->header('X-Forwarded-Proto') === 'https') {
             \URL::forceScheme('https');
         }
         
