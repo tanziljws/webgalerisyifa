@@ -41,6 +41,15 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
+### 4.1. Konfigurasi HTTPS (Untuk Production)
+Untuk memastikan semua form dan URL menggunakan HTTPS, tambahkan di file `.env`:
+```env
+APP_URL=https://yourdomain.com
+FORCE_HTTPS=true
+APP_ENV=production
+```
+**Catatan:** Aplikasi akan otomatis memaksa HTTPS di production environment.
+
 ### 5. Import Database
 - Buat database dengan nama `dbujikom`
 - Import file `database_schema.sql` ke database

@@ -540,13 +540,45 @@ async function viewPhoto(photoId) {
     });
     
     try {
-        const res = await fetch(`{{ url('admin/fotos') }}/${photoId}`);
+        // Use route helper to ensure correct URL
+        const baseUrl = '{{ url("/") }}';
+        const url = `${baseUrl}/admin/fotos/${photoId}`;
+        
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            credentials: 'same-origin'
+        });
+        
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`HTTP error! status: ${res.status}, message: ${errorText}`);
+        }
+        
         const data = await res.json();
-        if (data?.success) {
+        
+        if (data?.success && data?.data) {
             const f = data.data;
-            document.getElementById('viewPhotoImage').src = f.full_path ?? (`${location.origin}/storage/${f.path}`);
-            document.getElementById('viewPhotoTitle').textContent = f.judul ?? '';
-            document.getElementById('viewPhotoCategory').textContent = f.kategori?.nama ?? '—';
+            const imageSrc = f.full_path || (f.path ? `${window.location.origin}/storage/${f.path}` : '');
+            
+            const viewPhotoImage = document.getElementById('viewPhotoImage');
+            const viewPhotoTitle = document.getElementById('viewPhotoTitle');
+            const viewPhotoCategory = document.getElementById('viewPhotoCategory');
+            
+            if (viewPhotoImage && imageSrc) {
+                viewPhotoImage.src = imageSrc;
+            }
+            if (viewPhotoTitle) {
+                viewPhotoTitle.textContent = f.judul || '—';
+            }
+            if (viewPhotoCategory) {
+                viewPhotoCategory.textContent = f.kategori?.nama || '—';
+            }
             
             // Force cleanup before showing modal
             setTimeout(() => {
@@ -557,20 +589,22 @@ async function viewPhoto(photoId) {
                 
                 setTimeout(() => {
                     const modalEl = document.getElementById('viewPhotoModal');
-                    const modal = new bootstrap.Modal(modalEl, {
-                        backdrop: false,
-                        keyboard: true,
-                        focus: true
-                    });
-                    modal.show();
+                    if (modalEl) {
+                        const modal = new bootstrap.Modal(modalEl, {
+                            backdrop: false,
+                            keyboard: true,
+                            focus: true
+                        });
+                        modal.show();
+                    }
                 }, 50);
             }, 50);
         } else {
-            alert('Gagal memuat detail foto');
+            throw new Error(data?.message || 'Format response tidak valid');
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('Gagal memuat detail foto');
+        console.error('Error loading photo details:', error);
+        alert('Gagal memuat detail foto: ' + (error.message || 'Terjadi kesalahan'));
         
         // Remove any backdrop that might be stuck
         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
@@ -598,18 +632,45 @@ async function editPhoto(photoId) {
     });
     
     try {
-        const res = await fetch(`{{ url('admin/fotos') }}/${photoId}`);
+        // Use route helper to ensure correct URL
+        const baseUrl = '{{ url("/") }}';
+        const url = `${baseUrl}/admin/fotos/${photoId}`;
+        
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            credentials: 'same-origin'
+        });
+        
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`HTTP error! status: ${res.status}, message: ${errorText}`);
+        }
+        
         const data = await res.json();
-        if (data?.success) {
+        
+        if (data?.success && data?.data) {
             const f = data.data;
-            document.getElementById('edit_photo_id').value = f.id;
-            document.getElementById('edit_judul').value = f.judul ?? '';
-            document.getElementById('edit_kategori_id').value = f.kategori_id ?? '';
+            const editPhotoId = document.getElementById('edit_photo_id');
+            const editJudul = document.getElementById('edit_judul');
+            const editKategoriId = document.getElementById('edit_kategori_id');
+            
+            if (editPhotoId) editPhotoId.value = f.id || '';
+            if (editJudul) editJudul.value = f.judul || '';
+            if (editKategoriId) editKategoriId.value = f.kategori_id || '';
             
             // Update current photo preview if element exists
             const currentPhotoElement = document.getElementById('edit_current_photo');
             if (currentPhotoElement) {
-                currentPhotoElement.src = f.full_path ?? (`${location.origin}/storage/${f.path}`);
+                const imageSrc = f.full_path || (f.path ? `${window.location.origin}/storage/${f.path}` : '');
+                if (imageSrc) {
+                    currentPhotoElement.src = imageSrc;
+                }
             }
             
             // Force cleanup before showing modal
@@ -621,20 +682,22 @@ async function editPhoto(photoId) {
                 
                 setTimeout(() => {
                     const modalEl = document.getElementById('editPhotoModal');
-                    const modal = new bootstrap.Modal(modalEl, {
-                        backdrop: false,
-                        keyboard: true,
-                        focus: true
-                    });
-                    modal.show();
+                    if (modalEl) {
+                        const modal = new bootstrap.Modal(modalEl, {
+                            backdrop: false,
+                            keyboard: true,
+                            focus: true
+                        });
+                        modal.show();
+                    }
                 }, 50);
             }, 50);
         } else {
-            alert('Gagal memuat data foto');
+            throw new Error(data?.message || 'Format response tidak valid');
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('Gagal memuat data foto');
+        console.error('Error loading photo details for edit:', error);
+        alert('Gagal memuat detail foto: ' + (error.message || 'Terjadi kesalahan'));
         
         // Remove any backdrop that might be stuck
         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());

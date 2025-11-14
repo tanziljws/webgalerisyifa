@@ -111,10 +111,37 @@ class FotoController extends Controller
         }
     }
 
-    public function show(Foto $foto)
+    public function show($id)
     {
-        $foto->load('kategori');
-        return response()->json(['success' => true, 'data' => $foto]);
+        try {
+            $foto = Foto::with('kategori')->find($id);
+            
+            if (!$foto) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Foto tidak ditemukan'
+                ], 404);
+            }
+            
+            // Get full path using accessor
+            $fotoData = $foto->toArray();
+            $fotoData['full_path'] = $foto->full_path;
+            
+            return response()->json([
+                'success' => true, 
+                'data' => $fotoData
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error loading foto details: ' . $e->getMessage(), [
+                'foto_id' => $id ?? null,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat detail foto: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function create()
