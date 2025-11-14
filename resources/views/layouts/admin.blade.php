@@ -102,12 +102,16 @@
         
         @media (max-width: 767.98px) {
             .sidebar {
-                width: 200px;
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
+                width: 280px !important;
+                transform: translateX(-100%) !important;
+                transition: transform 0.3s ease !important;
+                visibility: hidden;
+                opacity: 0;
             }
             .sidebar.show {
-                transform: translateX(0);
+                transform: translateX(0) !important;
+                visibility: visible;
+                opacity: 1;
             }
         }
 
@@ -462,12 +466,16 @@
         /* Tablet Portrait (577px - 767px) */
         @media (min-width: 577px) and (max-width: 767.98px) {
             .sidebar {
-                width: 220px;
-                transform: translateX(-100%);
+                width: 280px !important;
+                transform: translateX(-100%) !important;
+                visibility: hidden;
+                opacity: 0;
             }
 
             .sidebar.show {
-                transform: translateX(0);
+                transform: translateX(0) !important;
+                visibility: visible;
+                opacity: 1;
                 box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
             }
 
@@ -508,12 +516,16 @@
         /* Mobile Landscape (481px - 576px) */
         @media (min-width: 481px) and (max-width: 576px) {
             .sidebar {
-                width: 200px;
-                transform: translateX(-100%);
+                width: 280px !important;
+                transform: translateX(-100%) !important;
+                visibility: hidden;
+                opacity: 0;
             }
 
             .sidebar.show {
-                transform: translateX(0);
+                transform: translateX(0) !important;
+                visibility: visible;
+                opacity: 1;
                 box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
             }
 
@@ -567,12 +579,16 @@
         /* Mobile Portrait (320px - 480px) */
         @media (max-width: 480px) {
             .sidebar {
-                width: 200px;
-                transform: translateX(-100%);
+                width: 280px !important;
+                transform: translateX(-100%) !important;
+                visibility: hidden;
+                opacity: 0;
             }
 
             .sidebar.show {
-                transform: translateX(0);
+                transform: translateX(0) !important;
+                visibility: visible;
+                opacity: 1;
                 box-shadow: 2px 0 15px rgba(0, 0, 0, 0.4);
             }
 
@@ -744,7 +760,7 @@
 
         /* Overlay for mobile sidebar */
         .sidebar-overlay {
-            display: none;
+            display: none !important;
             position: fixed;
             top: 0;
             left: 0;
@@ -754,11 +770,13 @@
             z-index: 1039;
             opacity: 0;
             transition: opacity 0.3s ease;
+            visibility: hidden;
         }
 
         .sidebar-overlay.show {
-            display: block;
+            display: block !important;
             opacity: 1;
+            visibility: visible;
         }
 
         @media (max-width: 767.98px) {
@@ -887,7 +905,7 @@
                         </div>
                     </div>
                     <!-- Close button for mobile -->
-                    <button class="sidebar-close" id="sidebarClose" type="button" onclick="if(typeof closeSidebar === 'function') { closeSidebar(); } else { const s = document.getElementById('sidebar'); const o = document.getElementById('sidebarOverlay'); const i = document.getElementById('toggleIcon'); if(s) s.classList.remove('show'); if(o) o.classList.remove('show'); document.body.style.overflow = ''; if(i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); } } return false;">
+                    <button class="sidebar-close" id="sidebarClose" type="button" onclick="const s = document.getElementById('sidebar'); const o = document.getElementById('sidebarOverlay'); const i = document.getElementById('toggleIcon'); if(s) { s.classList.remove('show'); s.style.transform = 'translateX(-100%)'; s.style.visibility = 'hidden'; s.style.opacity = '0'; } if(o) { o.classList.remove('show'); o.style.display = 'none'; } document.body.style.overflow = ''; if(i) { i.classList.remove('fa-times'); i.classList.add('fa-bars'); } if(typeof closeSidebar === 'function') closeSidebar(); return false; event.preventDefault(); event.stopPropagation();">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -967,21 +985,37 @@
                 close: !!sidebarClose
             });
             
-            // Ensure sidebar is hidden on mobile initially
+            // Ensure sidebar is hidden on mobile initially - FORCE HIDE
             if (window.innerWidth <= 767.98 && sidebar) {
                 sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-                console.log('✅ Sidebar hidden on mobile load');
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.style.visibility = 'hidden';
+                sidebar.style.opacity = '0';
+                if (overlay) {
+                    overlay.classList.remove('show');
+                    overlay.style.display = 'none';
+                }
+                console.log('✅ Sidebar FORCE HIDDEN on mobile load');
             }
             
             // Function to close sidebar (make it global so onclick can access it)
             window.closeSidebar = function() {
-                console.log('🔒 Closing sidebar');
+                console.log('🔒 Closing sidebar - FORCE CLOSE');
                 const s = document.getElementById('sidebar');
                 const o = document.getElementById('sidebarOverlay');
                 const i = document.getElementById('toggleIcon');
-                if (s) s.classList.remove('show');
-                if (o) o.classList.remove('show');
+                
+                if (s) {
+                    s.classList.remove('show');
+                    // Force hide dengan inline style sebagai backup
+                    s.style.transform = 'translateX(-100%)';
+                    s.style.visibility = 'hidden';
+                    s.style.opacity = '0';
+                }
+                if (o) {
+                    o.classList.remove('show');
+                    o.style.display = 'none';
+                }
                 document.body.style.overflow = '';
                 if (i) {
                     i.classList.remove('fa-times');
@@ -995,9 +1029,18 @@
             
             // Function to open sidebar
             function openSidebar() {
-                console.log('🔓 Opening sidebar');
-                if (sidebar) sidebar.classList.add('show');
-                if (overlay) overlay.classList.add('show');
+                console.log('🔓 Opening sidebar - FORCE OPEN');
+                if (sidebar) {
+                    sidebar.classList.add('show');
+                    // Force show dengan inline style
+                    sidebar.style.transform = 'translateX(0)';
+                    sidebar.style.visibility = 'visible';
+                    sidebar.style.opacity = '1';
+                }
+                if (overlay) {
+                    overlay.classList.add('show');
+                    overlay.style.display = 'block';
+                }
                 document.body.style.overflow = 'hidden';
                 if (toggleIcon) {
                     toggleIcon.classList.remove('fa-bars');
