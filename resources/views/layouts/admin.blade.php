@@ -857,8 +857,8 @@
 </head>
 <body>
     <!-- Mobile Toggle Button -->
-    <button class="sidebar-toggle" id="sidebarToggle">
-        <i class="fas fa-bars"></i>
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+        <i class="fas fa-bars" id="toggleIcon"></i>
     </button>
 
     <!-- Overlay for closing sidebar on mobile -->
@@ -950,6 +950,7 @@
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
             const sidebarClose = document.getElementById('sidebarClose');
+            const toggleIcon = document.getElementById('toggleIcon');
             
             console.log('📱 Elements found:', {
                 toggle: !!sidebarToggle,
@@ -971,6 +972,10 @@
                 if (sidebar) sidebar.classList.remove('show');
                 if (overlay) overlay.classList.remove('show');
                 document.body.style.overflow = '';
+                if (toggleIcon) {
+                    toggleIcon.classList.remove('fa-times');
+                    toggleIcon.classList.add('fa-bars');
+                }
             }
             
             // Function to open sidebar
@@ -979,6 +984,10 @@
                 if (sidebar) sidebar.classList.add('show');
                 if (overlay) overlay.classList.add('show');
                 document.body.style.overflow = 'hidden';
+                if (toggleIcon) {
+                    toggleIcon.classList.remove('fa-bars');
+                    toggleIcon.classList.add('fa-times');
+                }
             }
             
             if (sidebarToggle && sidebar && overlay) {
@@ -1049,6 +1058,14 @@
                 // Prevent sidebar from closing when clicking inside it
                 sidebar.addEventListener('click', function(e) {
                     e.stopPropagation();
+                });
+                
+                // Close sidebar when pressing Escape key
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape' && sidebar.classList.contains('show')) {
+                        console.log('⌨️ Escape key pressed, closing sidebar');
+                        closeSidebar();
+                    }
                 });
             } else {
                 console.error('❌ Missing elements:', {
