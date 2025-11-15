@@ -73,11 +73,9 @@
                 <thead>
                     <tr>
                         <th width="5%">No</th>
-                        <th width="20%">Nama Lengkap</th>
-                        <th width="18%">Username</th>
-                        <th width="27%">Email</th>
-                        <th width="15%">No. Telepon</th>
-                        <th width="15%" class="text-center">Tanggal Daftar</th>
+                        <th width="35%">Nama Lengkap</th>
+                        <th width="40%">Email</th>
+                        <th width="20%" class="text-center">Tanggal Daftar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,20 +83,18 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td><strong>{{ $user->name }}</strong></td>
-                        <td>{{ $user->username ?? '-' }}</td>
                         <td>{{ $user->email }}</td>
-                        <td>{{ $user->phone ?? '-' }}</td>
                         <td class="text-center">{{ $user->created_at->format('d/m/Y') }}</td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted">Tidak ada user aktif terdaftar pada periode ini</td>
+                        <td colspan="4" class="text-center text-muted">Tidak ada user aktif terdaftar pada periode ini</td>
                     </tr>
                     @endforelse
                 </tbody>
                 <tfoot class="table-light">
                     <tr>
-                        <th colspan="5" class="text-end">TOTAL USER AKTIF:</th>
+                        <th colspan="3" class="text-end">TOTAL USER AKTIF:</th>
                         <th class="text-center">{{ $summary['total_users'] }}</th>
                     </tr>
                 </tfoot>
@@ -244,18 +240,22 @@
     }
     
     .table thead {
-        background: #3b82f6;
+        background: #3b82f6 !important;
+        display: table-header-group !important; /* pastikan header kolom selalu tampil */
     }
     
     .table thead th {
-        color: #ffffff;
+        background-color: #3b82f6 !important;
+        color: #ffffff !important;
         font-weight: 600;
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.2px;
         padding: 0.65rem 0.5rem;
-        border: none;
+        border-bottom: 1px solid #d1d5db !important;
+        border-top: none !important;
         vertical-align: middle;
+        white-space: nowrap;
     }
     
     .table tbody tr {
