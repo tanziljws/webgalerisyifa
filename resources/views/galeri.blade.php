@@ -11,13 +11,7 @@ body {
     color: #3d4756;
 }
 
-/* Gallery Container */
-.gallery-container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 40px 20px 80px 20px;
-    min-height: 100vh;
-}
+/* Gallery Container - using Bootstrap container with py-5 for navbar spacing */
 
 /* Page Header */
 .page-header {
@@ -26,15 +20,15 @@ body {
 }
 
 .page-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 10px;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin-bottom: 8px !important;
 }
 
 .page-subtitle {
-    font-size: 1rem;
-    color: #6b7280;
+    font-size: 0.9rem !important;
+    color: #6b7280 !important;
 }
 
 /* Filter Section */
@@ -643,10 +637,6 @@ body {
         gap: 20px;
     }
     
-    .gallery-container {
-        padding: 120px 16px 60px 16px;
-    }
-    
     .page-title {
         font-size: 1.75rem;
     }
@@ -661,10 +651,6 @@ body {
     .gallery-grid {
         grid-template-columns: 1fr;
         gap: 20px;
-    }
-    
-    .gallery-container {
-        padding: 100px 16px 50px 16px;
     }
     
     .page-title {
@@ -831,7 +817,7 @@ body {
 @endsection
 
 @section('content')
-<div class="gallery-container">
+<div class="container py-5">
     <!-- Header -->
     <div class="page-header">
         <h1 class="page-title">Galeri Foto Kegiatan</h1>
