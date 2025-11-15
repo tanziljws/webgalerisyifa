@@ -185,9 +185,9 @@ class Foto extends Model
     /**
      * Get optimized image URL
      */
-    public function getOptimizedImageUrl($width = 300, $height = 300)
+    public function getOptimizedImageUrl($width = 300, $height = 300, $quality = 75)
     {
-        return \App\Helpers\ImageOptimizer::getOptimizedImageUrl($this->path, $width, $height);
+        return \App\Helpers\ImageOptimizer::getOptimizedImageUrl($this->path, $width, $height, $quality);
     }
 
     // Compatibility accessors/mutators to map `file` <-> `path`

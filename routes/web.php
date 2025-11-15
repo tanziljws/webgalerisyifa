@@ -31,6 +31,34 @@ Route::get('/storage/{path}', function($path) {
     return response()->file($filePath, ['Content-Type' => $mimeType]);
 })->where('path', '.*')->name('storage.file');
 
+// Optimized image route (on-the-fly image optimization)
+Route::get('/img/optimized', function(\Illuminate\Http\Request $request) {
+    $path = $request->get('path');
+    $width = (int) $request->get('w', 0);
+    $height = (int) $request->get('h', 0);
+    $quality = (int) $request->get('q', 75);
+    
+    if (!$path) {
+        abort(404);
+    }
+    
+    // Decode base64 path
+    $imagePath = base64_decode($path);
+    
+    if (!$imagePath) {
+        abort(404);
+    }
+    
+    // Serve optimized image
+    $response = \App\Helpers\ImageOptimizer::serveOptimizedImage($imagePath, $width, $height, $quality);
+    
+    if (!$response) {
+        abort(404);
+    }
+    
+    return $response;
+})->name('image.optimized');
+
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 

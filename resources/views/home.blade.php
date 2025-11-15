@@ -479,10 +479,18 @@
 <section class="hero-section hero-section--full section-slice">
     <div class="hero-background">
         <div class="hero-slideshow">
-            <img src="{{ asset('images/1.JPG') }}" class="hero-bg-image active" alt="SMKN 4 BOGOR Background 1">
-            <img src="{{ asset('images/IMG_8801.JPG') }}" class="hero-bg-image" alt="SMKN 4 BOGOR Background 2">
-            <img src="{{ asset('images/lapangan.JPG') }}" class="hero-bg-image" alt="SMKN 4 BOGOR Background 3">
-            <img src="{{ asset('images/smk.JPG') }}" class="hero-bg-image" alt="SMKN 4 BOGOR Background 4">
+            @php
+                // Optimize hero images for better mobile performance
+                // Hero images: max 1920px width (full HD), quality 85 for good quality
+                $hero1 = \App\Helpers\ImageOptimizer::getOptimizedImageUrl('images/1.JPG', 1920, 0, 85);
+                $hero2 = \App\Helpers\ImageOptimizer::getOptimizedImageUrl('images/IMG_8801.JPG', 1920, 0, 85);
+                $hero3 = \App\Helpers\ImageOptimizer::getOptimizedImageUrl('images/lapangan.JPG', 1920, 0, 85);
+                $hero4 = \App\Helpers\ImageOptimizer::getOptimizedImageUrl('images/smk.JPG', 1920, 0, 85);
+            @endphp
+            <img src="{{ $hero1 }}" class="hero-bg-image active" alt="SMKN 4 BOGOR Background 1" loading="eager" fetchpriority="high">
+            <img src="{{ $hero2 }}" class="hero-bg-image" alt="SMKN 4 BOGOR Background 2" loading="lazy">
+            <img src="{{ $hero3 }}" class="hero-bg-image" alt="SMKN 4 BOGOR Background 3" loading="lazy">
+            <img src="{{ $hero4 }}" class="hero-bg-image" alt="SMKN 4 BOGOR Background 4" loading="lazy">
         </div>
         <div class="hero-overlay">
             <div class="container">
@@ -587,7 +595,10 @@
             <div class="col-xl-3 col-lg-3 col-md-6 reveal">
                 <div class="card border-0 shadow-lg h-100 zoom-img" style="border-radius: 16px; transition: transform 0.25s ease, box-shadow 0.25s ease; overflow: hidden;">
                     <div class="position-relative" style="height: 200px; overflow: hidden;">
-                        <img src="{{ asset('images/jurusan/pplg.jpeg') }}" alt="PPLG" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                        @php
+                            $pplgImg = \App\Helpers\ImageOptimizer::getOptimizedImageUrl('images/jurusan/pplg.jpeg', 400, 200, 75);
+                        @endphp
+                        <img src="{{ $pplgImg }}" alt="PPLG" class="img-fluid w-100 h-100" style="object-fit: cover;" loading="lazy">
                         <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(13, 110, 253, 0.8); opacity: 0; transition: opacity 0.3s ease;">
                             <div class="text-white text-center">
                                 <i class="fas fa-laptop-code" style="font-size: 2rem;"></i>
@@ -606,7 +617,10 @@
             <div class="col-xl-3 col-lg-3 col-md-6 reveal">
                 <div class="card border-0 shadow-lg h-100 zoom-img" style="border-radius: 16px; transition: transform 0.25s ease, box-shadow 0.25s ease; overflow: hidden;">
                     <div class="position-relative" style="height: 200px; overflow: hidden;">
-                        <img src="{{ asset('images/jurusan/tjkt.jpeg') }}" alt="TJKT" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                        @php
+                            $tjktImg = \App\Helpers\ImageOptimizer::getOptimizedImageUrl('images/jurusan/tjkt.jpeg', 400, 200, 75);
+                        @endphp
+                        <img src="{{ $tjktImg }}" alt="TJKT" class="img-fluid w-100 h-100" style="object-fit: cover;" loading="lazy">
                         <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(25, 135, 84, 0.8); opacity: 0; transition: opacity 0.3s ease;">
                             <div class="text-white text-center">
                                 <i class="fas fa-network-wired" style="font-size: 2rem;"></i>
@@ -625,7 +639,10 @@
             <div class="col-xl-3 col-lg-3 col-md-6 reveal">
                 <div class="card border-0 shadow-lg h-100 zoom-img" style="border-radius: 16px; transition: transform 0.25s ease, box-shadow 0.25s ease; overflow: hidden;">
                     <div class="position-relative" style="height: 200px; overflow: hidden;">
-                        <img src="{{ asset('images/jurusan/to.jpeg') }}" alt="TO" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                        @php
+                            $toImg = \App\Helpers\ImageOptimizer::getOptimizedImageUrl('images/jurusan/to.jpeg', 400, 200, 75);
+                        @endphp
+                        <img src="{{ $toImg }}" alt="TO" class="img-fluid w-100 h-100" style="object-fit: cover;" loading="lazy">
                         <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(13, 202, 240, 0.8); opacity: 0; transition: opacity 0.3s ease;">
                             <div class="text-white text-center">
                                 <i class="fas fa-cogs" style="font-size: 2rem;"></i>
@@ -644,7 +661,10 @@
             <div class="col-xl-3 col-lg-3 col-md-6 reveal">
                 <div class="card border-0 shadow-lg h-100 zoom-img" style="border-radius: 16px; transition: transform 0.25s ease, box-shadow 0.25s ease; overflow: hidden;">
                     <div class="position-relative" style="height: 200px; overflow: hidden;">
-                        <img src="{{ asset('images/jurusan/tpfl.jpeg') }}" alt="TPFL" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                        @php
+                            $tpflImg = \App\Helpers\ImageOptimizer::getOptimizedImageUrl('images/jurusan/tpfl.jpeg', 400, 200, 75);
+                        @endphp
+                        <img src="{{ $tpflImg }}" alt="TPFL" class="img-fluid w-100 h-100" style="object-fit: cover;" loading="lazy">
                         <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(255, 193, 7, 0.8); opacity: 0; transition: opacity 0.3s ease;">
                             <div class="text-white text-center">
                                 <i class="fas fa-industry" style="font-size: 2rem;"></i>
@@ -853,9 +873,14 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4 text-center">
-                <img src="{{ asset('storage/' . $foto->path) }}" 
+                @php
+                    // Use optimized image for modal (max 800px width, quality 80)
+                    $modalImageUrl = $foto->getOptimizedImageUrl(800, 0, 80);
+                @endphp
+                <img src="{{ $modalImageUrl }}" 
                      class="img-fluid rounded shadow-sm" 
                      alt="{{ $foto->judul }}"
+                     loading="lazy"
                      style="max-height: 500px; object-fit: contain;">
                 @if($foto->deskripsi)
                 <div class="mt-3">

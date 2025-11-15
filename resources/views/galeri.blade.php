@@ -11,11 +11,71 @@ body {
     color: #3d4756;
 }
 
+/* Hero Section */
+.hero-section {
+    position: relative;
+    height: 50vh;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-top: -10px;
+    padding-top: 10px;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{{ asset('images/smk.JPG') }}');
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: white;
+    padding: 20px;
+}
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 /* Gallery Container */
 .gallery-container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 140px 20px 80px 20px;
+    padding: 40px 20px 80px 20px;
     min-height: 100vh;
 }
 
@@ -129,7 +189,7 @@ body {
     align-items: center;
     justify-content: center;
 }
-    
+
 .gallery-card-image img {
     width: 100%;
     height: 100%;
@@ -831,6 +891,16 @@ body {
 @endsection
 
 @section('content')
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-background"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1>Galeri Foto Kegiatan</h1>
+        <p>Lihat dokumentasi kegiatan, prestasi dan produk sekolah SMKN 4 BOGOR</p>
+    </div>
+</section>
+
 <div class="gallery-container">
     <!-- Header -->
     <div class="page-header">
@@ -858,10 +928,16 @@ body {
     <!-- Gallery Grid - CSS Grid Biasa -->
     <div class="gallery-grid">
         @forelse($fotos as $foto)
+            @php
+                // Use optimized image URL for thumbnail (300x300, quality 70 for smaller file size)
+                $thumbnailUrl = $foto->getOptimizedImageUrl(300, 300, 70);
+                // Full size for modal preview (max 1200px width, quality 80)
+                $fullImageUrl = $foto->getOptimizedImageUrl(1200, 0, 80);
+            @endphp
             <div class="gallery-card">
                 <!-- Image Container -->
-                <div class="gallery-card-image" onclick="openImagePreview('{{ Storage::url($foto->path) }}', '{{ $foto->judul }}')">
-                    <img src="{{ Storage::url($foto->path) }}" 
+                <div class="gallery-card-image" onclick="openImagePreview('{{ $fullImageUrl }}', '{{ $foto->judul }}')">
+                    <img src="{{ $thumbnailUrl }}" 
                          alt="{{ $foto->judul }}" 
                          loading="lazy"
                          width="300" 
