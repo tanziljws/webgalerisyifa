@@ -12,6 +12,11 @@ body {
 }
 
 /* Gallery Container - using Bootstrap container with py-5 for navbar spacing */
+/* Override py-5 untuk memberikan spacing yang cukup dari navbar fixed */
+.container.py-5 {
+    padding-top: calc(var(--navbar-h, 80px) + 2rem) !important;
+    padding-bottom: 3rem !important;
+}
 
 /* Page Header */
 .page-header {
@@ -648,6 +653,11 @@ body {
 
 /* Mobile - 1 kolom */
 @media (max-width: 640px) {
+    .container.py-5 {
+        padding-top: calc(var(--navbar-h, 80px) + 1.5rem) !important;
+        padding-bottom: 2rem !important;
+    }
+    
     .gallery-grid {
         grid-template-columns: 1fr;
         gap: 20px;
